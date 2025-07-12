@@ -9,7 +9,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const navOptions = [
     { label: "Dashboard", href: "/dashboard", icon: "🏠" },
     { label: "Entries", href: "/entries", icon: "📋" },
-    { label: "Add Entry", href: "entry", icon: "➕" },
+        { label: "Add Entry", href: "/entry", icon: "➕" },
   ];
   const handleLogout = () => {
     clearSession();

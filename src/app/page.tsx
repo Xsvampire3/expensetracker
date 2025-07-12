@@ -1,15 +1,14 @@
 
-"use client";
 
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
 
-export default function Home() {
-  const user = typeof window !== "undefined" ? getSession() : null;
+export default async function Home() {
+  const user = await getSession();
   if (!user) {
     redirect("/login");
-    return null;
+  } else {
+    redirect("/dashboard");
   }
-  redirect("/dashboard");
   return null;
 }
