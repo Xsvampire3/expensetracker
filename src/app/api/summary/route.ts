@@ -12,11 +12,9 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Missing userId" }, { status: 400 });
   }
 
-  // Custom date range support
   const startDate = searchParams.get("startDate") ? new Date(searchParams.get("startDate")!) : null;
   const endDate = searchParams.get("endDate") ? new Date(searchParams.get("endDate")!) : null;
 
-  // Helper to build match object
   const buildMatch = (from: Date | null, to: Date | null) => {
     const match: any = { user: userObjectId };
     if (from && to) match.date = { $gte: from, $lte: to };
@@ -31,7 +29,6 @@ export async function GET(req: Request) {
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const startOfYear = new Date(now.getFullYear(), 0, 1);
 
-  // Chart data: last 14 days or custom range
   const chartMatch = (startDate || endDate)
     ? buildMatch(startDate, endDate)
     : { user: userObjectId, date: { $gte: new Date(now.getFullYear(), now.getMonth(), now.getDate() - 13) } };
@@ -47,7 +44,6 @@ export async function GET(req: Request) {
     { $sort: { _id: 1 } }
   ]);
 
-  // Aggregations for summary cards (always use respective periods)
   const [day, week, month, year, categoryExpenses, incomeVsExpense] = await Promise.all([
     Entry.aggregate([
       { $match: buildMatch(startOfDay, null) },
@@ -65,13 +61,11 @@ export async function GET(req: Request) {
       { $match: buildMatch(startOfYear, null) },
       { $group: { _id: "$type", total: { $sum: "$amount" } } },
     ]),
-    // Category-wise expenses (pie chart)
     Entry.aggregate([
       { $match: { ...buildMatch(startDate, endDate), type: "expense" } },
       { $group: { _id: "$category", total: { $sum: "$amount" } } },
       { $sort: { total: -1 } }
     ]),
-    // Income vs Expense (bar chart)
     Entry.aggregate([
       { $match: buildMatch(startDate, endDate) },
       { $group: { _id: "$type", total: { $sum: "$amount" } } }

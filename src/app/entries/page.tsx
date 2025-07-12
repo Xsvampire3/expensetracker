@@ -14,7 +14,7 @@ const defaultFilters = {
   endDate: "",
 };
 
-export default function EntriesPage() {
+export default function Page() {
   const [categories, setCategories] = useState<string[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [entryToDelete, setEntryToDelete] = useState<string | null>(null);

@@ -21,7 +21,6 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Missing userId" }, { status: 400 });
   }
 
-  // Filters
   const type = searchParams.get("type") || "all";
   const category = searchParams.get("category") || "";
   const minAmount = parseFloat(searchParams.get("minAmount") || "");
@@ -31,7 +30,6 @@ export async function GET(req: Request) {
   const page = parseInt(searchParams.get("page") || "1", 10);
   const limit = 10;
 
-  // Build query
   const query: any = { user: userId };
   if (type !== "all") query.type = type;
   if (category) query.category = { $regex: category, $options: "i" };
@@ -40,17 +38,14 @@ export async function GET(req: Request) {
   if (startDate) query.date = { ...query.date, $gte: startDate };
   if (endDate) query.date = { ...query.date, $lte: endDate };
 
-  // Get total count for pagination
   const totalCount = await Entry.countDocuments(query);
   const totalPages = Math.max(1, Math.ceil(totalCount / limit));
 
-  // Get paginated entries
   const entries = await Entry.find(query)
     .sort({ date: -1 })
     .skip((page - 1) * limit)
     .limit(limit);
 
-  // Calculate totals for filtered entries
   const allFilteredEntries = await Entry.find(query);
   const incomeTotal = allFilteredEntries.filter(e => e.type === "income").reduce((sum, e) => sum + e.amount, 0);
   const expenseTotal = allFilteredEntries.filter(e => e.type === "expense").reduce((sum, e) => sum + e.amount, 0);

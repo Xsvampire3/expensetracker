@@ -17,6 +17,5 @@ export async function POST(req: Request) {
   if (!isMatch) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
-  // For demo: return user info (in production, use JWT/session)
   return NextResponse.json({ message: "Login successful", user: { id: user._id, name: user.name, email: user.email } });
 }
