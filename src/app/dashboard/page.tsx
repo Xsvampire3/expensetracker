@@ -217,16 +217,12 @@ export default function Page() {
               const expense = summary?.[period.key]?.find((s:any)=>s._id==='expense')?.total || 0;
               const income = summary?.[period.key]?.find((s:any)=>s._id==='income')?.total || 0;
               const balance = getBalance(summary?.[period.key] || []);
-              
               return (
                 <motion.div
                   key={period.key}
                   variants={itemVariants}
-                  whileHover={{ 
-                    scale: 1.05, 
-                    boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
-                    transition: { duration: 0.2 }
-                  }}
+                  whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.1)", transition: { duration: 0.2 } }}
+                  whileTap={{ scale: 0.98 }}
                   className="relative group"
                 >
                   <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 relative overflow-hidden">
@@ -278,6 +274,7 @@ export default function Page() {
             <motion.div
               variants={itemVariants}
               whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               className="lg:col-span-2 xl:col-span-1"
             >
               <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20">
@@ -379,6 +376,7 @@ export default function Page() {
             <motion.div
               variants={itemVariants}
               whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20">
                 <div className="flex items-center gap-3 mb-6">
@@ -464,6 +462,7 @@ export default function Page() {
             <motion.div
               variants={itemVariants}
               whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20">
                 <div className="flex items-center gap-3 mb-6">
