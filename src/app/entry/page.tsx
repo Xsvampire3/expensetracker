@@ -186,7 +186,7 @@ export default function Page() {
       animate="visible"
       variants={containerVariants}
     >
-         <div className="absolute inset-0 overflow-hidden">
+         <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Animated gradient orbs */}
         <div className="absolute top-0 left-0 w-72 h-72 bg-gradient-to-br from-blue-400/20 to-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute top-1/4 right-0 w-96 h-96 bg-gradient-to-br from-emerald-400/20 to-teal-600/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
