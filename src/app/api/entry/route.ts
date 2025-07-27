@@ -27,6 +27,10 @@ export async function GET(req: Request) {
   const maxAmount = parseFloat(searchParams.get("maxAmount") || "");
   const startDate = searchParams.get("startDate") ? new Date(searchParams.get("startDate")!) : null;
   const endDate = searchParams.get("endDate") ? new Date(searchParams.get("endDate")!) : null;
+  const filterMonth = searchParams.get("month"); // "01" to "12"
+  const filterYear = searchParams.get("year");   // "2024", "2025", etc.
+  const filterDate = searchParams.get("date");   // "2024-07-27"
+  const filterWeek = searchParams.get("week");   // "2024-07-21" (start of week)
   const page = parseInt(searchParams.get("page") || "1", 10);
   const limit = 10;
 
@@ -35,8 +39,37 @@ export async function GET(req: Request) {
   if (category) query.category = { $regex: category, $options: "i" };
   if (!isNaN(minAmount)) query.amount = { ...query.amount, $gte: minAmount };
   if (!isNaN(maxAmount)) query.amount = { ...query.amount, $lte: maxAmount };
-  if (startDate) query.date = { ...query.date, $gte: startDate };
-  if (endDate) query.date = { ...query.date, $lte: endDate };
+  
+  // Handle date filtering with priority: date > week > month/year > date range
+  if (filterDate) {
+    const filterDateObj = new Date(filterDate);
+    const startOfFilterDate = new Date(filterDateObj.getFullYear(), filterDateObj.getMonth(), filterDateObj.getDate());
+    const endOfFilterDate = new Date(filterDateObj.getFullYear(), filterDateObj.getMonth(), filterDateObj.getDate(), 23, 59, 59, 999);
+    query.date = { $gte: startOfFilterDate, $lte: endOfFilterDate };
+  } else if (filterWeek) {
+    const weekStartDate = new Date(filterWeek);
+    const weekEndDate = new Date(weekStartDate);
+    weekEndDate.setDate(weekStartDate.getDate() + 6);
+    weekEndDate.setHours(23, 59, 59, 999);
+    query.date = { $gte: weekStartDate, $lte: weekEndDate };
+  } else if (filterMonth || filterYear) {
+    const yearNum = filterYear ? parseInt(filterYear) : new Date().getFullYear();
+    
+    if (filterMonth) {
+      const monthNum = parseInt(filterMonth) - 1; // MongoDB months are 0-based
+      const startOfFilterMonth = new Date(yearNum, monthNum, 1);
+      const endOfFilterMonth = new Date(yearNum, monthNum + 1, 0, 23, 59, 59, 999);
+      query.date = { $gte: startOfFilterMonth, $lte: endOfFilterMonth };
+    } else if (filterYear) {
+      const startOfFilterYear = new Date(yearNum, 0, 1);
+      const endOfFilterYear = new Date(yearNum, 11, 31, 23, 59, 59, 999);
+      query.date = { $gte: startOfFilterYear, $lte: endOfFilterYear };
+    }
+  } else {
+    // Fallback to existing date range logic
+    if (startDate) query.date = { ...query.date, $gte: startDate };
+    if (endDate) query.date = { ...query.date, $lte: endDate };
+  }
 
   const totalCount = await Entry.countDocuments(query);
   const totalPages = Math.max(1, Math.ceil(totalCount / limit));
